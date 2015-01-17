@@ -17,6 +17,7 @@ class LanguagePack::Base
 
   VENDOR_URL           = ENV['BUILDPACK_VENDOR_URL'] || "https://s3-external-1.amazonaws.com/heroku-buildpack-ruby"
   DEFAULT_LEGACY_STACK = "cedar"
+  ROOT_DIR             = File.expand_path("../../..", __FILE__)
 
   ICU4C_URL = 'https://s3.amazonaws.com/frederick-heroku-binaries/icu4c-52.1.0.tar.gz'
 
@@ -156,6 +157,21 @@ private ##################################
     add_to_profiled %{export #{key}="#{val.gsub('"','\"')}"}
   end
 
+  def add_to_export(string)
+    export = File.join(ROOT_DIR, "export")
+    File.open(export, "a") do |file|
+      file.puts string
+    end
+  end
+
+  def set_export_default(key, val)
+    add_to_export "export #{key}=${#{key}:-#{val}}"
+  end
+
+  def set_export_override(key, val)
+    add_to_export %{export #{key}="#{val.gsub('"','\"')}"}
+  end
+
   def log_internal(*args)
     message = build_log_message(args)
     %x{ logger -p user.notice -t "slugc[$$]" "buildpack-ruby #{message}" }
@@ -172,4 +188,3 @@ private ##################################
     end.join(" ")
   end
 end
-
