@@ -291,7 +291,7 @@ SHELL
       set_env_override "PATH",     binstubs_relative_paths.map {|path| "$HOME/#{path}" }.join(":") + ":$PATH"
       set_env_default  "LD_LIBRARY_PATH", "/app/vendor/#{ICU4C_VENDOR_PATH}/lib"
 
-      # add_to_profiled set_default_web_concurrency
+      add_to_profiled set_default_web_concurrency if env("SENSIBLE_DEFAULTS")
 
       if ruby_version.jruby?
         add_to_profiled set_jvm_max_heap
@@ -577,9 +577,9 @@ WARNING
           instrument "ruby.bundle_clean" do
             # Only show bundle clean output when not using default cache
             if load_default_cache?
-              run "bundle clean > /dev/null"
+              run("#{bundle_bin} clean > /dev/null", user_env: true)
             else
-              pipe("#{bundle_bin} clean", out: "2> /dev/null")
+              pipe("#{bundle_bin} clean", out: "2> /dev/null", user_env: true)
             end
           end
           @bundler_cache.store
@@ -606,10 +606,6 @@ ERROR
   end
 
   def post_bundler
-    if bundler.has_gem?('yui-compressor') && !ruby_version.jruby?
-      install_jvm(true)
-      ENV["PATH"] += ":bin"
-    end
   end
 
   # RUBYOPT line that requires syck_hack file
