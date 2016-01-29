@@ -16,7 +16,7 @@ class LanguagePack::Ruby < LanguagePack::Base
   LIBYAML_PATH         = "libyaml-#{LIBYAML_VERSION}"
   BUNDLER_VERSION      = "1.9.7"
   BUNDLER_GEM_PATH     = "bundler-#{BUNDLER_VERSION}"
-  DEFAULT_RUBY_VERSION = "ruby-2.0.0"
+  DEFAULT_RUBY_VERSION = "ruby-2.2.4"
   RBX_BASE_URL         = "http://binaries.rubini.us/heroku"
   NODE_BP_PATH         = "vendor/node/bin"
   ICU4C_VENDOR_PATH    = "icu4c-52.1.0"
@@ -222,7 +222,7 @@ EOF
   def set_java_mem
     <<-EOF
 if ! [[ "${JAVA_OPTS}" == *-Xmx* ]]; then
-  export JAVA_MEM=${JAVA_MEM:--Xmx${JVM_MAX_HEAP}m}
+  export JAVA_MEM=${JAVA_MEM:--Xmx${JVM_MAX_HEAP:-384}m}
 fi
 EOF
   end
@@ -760,7 +760,7 @@ params = CGI.parse(uri.query || "")
   # decides if we need to enable the dev database addon
   # @return [Array] the database addon if the pg gem is detected or an empty Array if it isn't.
   def add_dev_database_addon
-    bundler.has_gem?("pg") ? ['heroku-postgresql:hobby-dev'] : []
+    bundler.has_gem?("pg") ? ['heroku-postgresql'] : []
   end
 
   # decides if we need to install the node.js binary
