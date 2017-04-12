@@ -162,19 +162,18 @@ WARNING
     "/usr/local/bin:/usr/bin:/bin"
   end
 
+  def self.slug_vendor_base
+    command = %q(ruby -e "require 'rbconfig';puts \"vendor/bundle/#{RUBY_ENGINE}/#{RbConfig::CONFIG['ruby_version']}\"")
+    slug_vendor_base = run_no_pipe(command, user_env: true).chomp
+    error "Problem detecting bundler vendor directory: #{@slug_vendor_base}" unless $?.success?
+    return slug_vendor_base
+  end
+
   # the relative path to the bundler directory of gems
   # @return [String] resulting path
   def slug_vendor_base
     instrument 'ruby.slug_vendor_base' do
-      if @slug_vendor_base
-        @slug_vendor_base
-      elsif ruby_version.ruby_version == "1.8.7"
-        @slug_vendor_base = "vendor/bundle/1.8"
-      else
-        @slug_vendor_base = run_no_pipe(%q(ruby -e "require 'rbconfig';puts \"vendor/bundle/#{RUBY_ENGINE}/#{RbConfig::CONFIG['ruby_version']}\"")).chomp
-        error "Problem detecting bundler vendor directory: #{@slug_vendor_base}" unless $?.success?
-        @slug_vendor_base
-      end
+      @slug_vendor_base ||= self.class.slug_vendor_base
     end
   end
 
@@ -333,7 +332,7 @@ SHELL
   def setup_profiled
     instrument 'setup_profiled' do
       profiled_path = [binstubs_relative_paths.map {|path| "$HOME/#{path}" }.join(":")]
-      profiled_path << "vendor/#{@yarn_installer.binary_path}" if add_yarn_binary
+      profiled_path << "vendor/#{@yarn_installer.binary_path}" if has_yarn_binary?
       profiled_path << "$PATH"
 
       set_env_default  "LANG",     "en_US.UTF-8"
@@ -812,6 +811,10 @@ params = CGI.parse(uri.query || "")
 
   def add_yarn_binary
     bundler.has_gem?('webpacker') && yarn_not_preinstalled? ? [@yarn_installer.name] : []
+  end
+
+  def has_yarn_binary?
+    add_yarn_binary.any?
   end
 
   # checks if node.js is installed via the official heroku-buildpack-nodejs using multibuildpack
