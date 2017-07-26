@@ -1,5 +1,9 @@
 ## Master
 
+## v167 (07/25/2016)
+
+* Update Bundler to 1.15.2 (#602)
+
 ## v166 (07/11/2017)
 
 * no changes from v165
