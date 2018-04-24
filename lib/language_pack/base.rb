@@ -23,7 +23,7 @@ class LanguagePack::Base
 
   ICU4C_URL = 'https://s3.amazonaws.com/frederick-heroku-binaries/icu4c-52.1.0.tar.gz'
 
-  attr_reader :build_path, :cache
+  attr_reader :build_path, :cache, :stack
 
   # changes directory to the build_path
   # @param [String] the path of the build dir
