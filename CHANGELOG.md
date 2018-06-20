@@ -1,5 +1,13 @@
 ## Master
 
+## v187 (6/19/2018)
+
+* Prevent apps from deploying with known security vulnerability activated via config (#776)
+
+## v186 (6/12/2018)
+
+* The Ruby buildpack can now detect Rails configuration in a project (#758 #770)
+
 ## v185 (5/31/2018)
 
 * The Ruby buildpack bootstrap Ruby version is now 2.5.1. This is not a customer facing feature (#765)
